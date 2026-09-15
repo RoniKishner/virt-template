@@ -3,10 +3,12 @@
 ## Strict Rules
 
 - Never modify generated files by hand - use `make generate`, `make manifests`, and `make vendor`
+- Never hand-edit generated manifests under `config/` (CRDs, RBAC, webhook configs) - regenerate with `make manifests` instead
 - Never remove or modify Apache 2.0 license headers (see `hack/boilerplate.go.txt`)
 - Never bypass linting or skip `make all` before pushing
 - Never commit vendor changes without running `make vendor`
 - Never modify CRD type definitions without running `make generate` and `make manifests` afterward
+- Treat changes to `VirtualMachineTemplate`/`VirtualMachineTemplateRequest` fields in `api/core/` as potentially breaking the API - all exported fields require kubebuilder validation markers and godoc comments
 
 ## Project Overview
 
@@ -159,6 +161,11 @@ Key patterns:
 - Deterministic child object names via FNV-32a hash (`internal/apimachinery/naming.go`)
 - VirtualMachineTemplateRequest spec is immutable (CEL rule: `self == oldSelf`)
 
+### Validation webhooks (`internal/webhook/`)
+
+- Enforce immutability rules (e.g. the `VirtualMachineTemplateRequest` spec CEL rule above) at the webhook layer as well as via CEL
+- Validate parameter placeholder syntax (`${PARAM}` / `${{PARAM}}`) on `VirtualMachineTemplate` writes
+
 ### Cross-namespace authorization
 
 ValidatingAdmissionPolicy with CEL checks three permissions when creating a VirtualMachineTemplateRequest:
@@ -173,6 +180,8 @@ Aggregated API server serving subresources only (no direct storage for the paren
 - `POST /virtualmachinetemplates/{name}/create` - process template + create VM in cluster
 
 Parent resource uses a dummy REST storage required by the k8s.io/apiserver framework. The APIResourceList is filtered to hide it.
+
+RBAC on the aggregated API is enforced via SubjectAccessReview delegation to the main API server; handlers must surface upstream errors (e.g. from the processing engine or the cluster client) as proper Kubernetes API status errors rather than opaque 500s.
 
 ## Deployment
 
