@@ -1,11 +1,11 @@
 # AGENTS.md - config
 
-Kubebuilder-based Kustomize manifests: CRDs, RBAC, webhook configs, and three deployment overlays.
+Kubebuilder-based Kustomize manifests for deploying virt-template.
 
 ## Rules
 
-- Never hand-edit generated manifests here (CRDs, RBAC, webhook configs) - they're produced by `make manifests` from `api/` type markers and `+kubebuilder:rbac` markers in the code. Change the source markers and regenerate instead
-- `hack/lint.sh` runs `yamllint` against this directory - keep YAML lint-clean
+- To change generated manifests here (CRDs, RBAC, webhook configs), update the source markers in `api/` type definitions or `+kubebuilder:rbac` markers in the code and run `make manifests` to regenerate
+- Always keep YAML in this directory lint-clean (`hack/lint.sh` runs `yamllint` against it)
 
 ## Cross-namespace authorization
 

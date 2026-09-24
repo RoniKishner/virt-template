@@ -123,7 +123,10 @@ Parameter substitution and generation for processing templates into VMs. Two sub
 
 ## Validation Webhooks
 
-Enforce `VirtualMachineTemplateRequest` spec immutability and `VirtualMachineTemplate` parameter placeholder validity. See `internal/webhook/AGENTS.md`.
+Two separate enforcement points:
+
+- **`VirtualMachineTemplateRequest` spec immutability** is enforced by a CEL `self == oldSelf` rule declared on the API type, not by a webhook. See `api/core/AGENTS.md`.
+- **`VirtualMachineTemplate` parameter placeholder validity** is enforced by a validating webhook. See `internal/webhook/AGENTS.md`.
 
 ## API Server
 

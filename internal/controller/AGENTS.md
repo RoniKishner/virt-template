@@ -25,7 +25,7 @@ Key patterns - preserve these when touching the reconciler:
 - `Progressing=True` + `Ready=False` means in-progress (will requeue). `Progressing=False` + `Ready=False` means permanent failure (stops)
 - Objects tracked by `template.kubevirt.io/RequestUID` label on child resources
 - Deterministic child object names via FNV-32a hash (`internal/apimachinery/naming.go`)
-- `VirtualMachineTemplateRequest` spec is immutable (CEL rule: `self == oldSelf`) - the reconciler must not assume it can react to spec updates
+- `VirtualMachineTemplateRequest` spec is immutable (CEL rule: `self == oldSelf`) - the reconciler can safely assume the spec remains constant throughout its lifecycle.
 
 Cross-namespace authorization is enforced by a `ValidatingAdmissionPolicy` in `config/admission/` - see `config/AGENTS.md`.
 
